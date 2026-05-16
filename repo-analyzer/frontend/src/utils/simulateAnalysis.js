@@ -1,88 +1,32 @@
-// Simulated analysis steps for demo
-export const ANALYSIS_STEPS = [
-  { 
-    id: 1, 
-    label: 'Cloning repositories', 
-    icon: '📦',
-    duration: 3000,
-    description: 'Fetching repository data from GitHub...'
-  },
-  { 
-    id: 2, 
-    label: 'Analyzing file structure', 
-    icon: '📁',
-    duration: 4000,
-    description: 'Scanning files and directories...'
-  },
-  { 
-    id: 3, 
-    label: 'Mapping dependencies', 
-    icon: '🔗',
-    duration: 5000,
-    description: 'Building dependency graph...'
-  },
-  { 
-    id: 4, 
-    label: 'Identifying critical developers', 
-    icon: '👥',
-    duration: 5000,
-    description: 'Analyzing git history and contributions...'
-  },
-  { 
-    id: 5, 
-    label: 'Detecting code duplication', 
-    icon: '🔍',
-    duration: 4000,
-    description: 'Scanning for duplicate code patterns...'
-  },
-  { 
-    id: 6, 
-    label: 'Calculating financial impact', 
-    icon: '💰',
-    duration: 5000,
-    description: 'Computing cost savings and ROI...'
-  },
-  { 
-    id: 7, 
-    label: 'Generating recommendations', 
-    icon: '✨',
-    duration: 4000,
-    description: 'Creating actionable insights...'
-  }
-];
+export const TOTAL_DURATION = 5000; // 5 seconds total
 
 /**
- * Simulates the analysis process with progress callbacks
- * @param {Function} onProgress - Called with (step, percentage) for each update
- * @param {Function} onComplete - Called when analysis is complete
+ * Simulates the analysis process with smooth progress updates
+ * @param {Function} onProgress - Called with progress updates
  * @returns {Promise} Resolves when analysis is complete
  */
-export function simulateAnalysis(onProgress, onComplete) {
+export function simulateAnalysis(onProgress) {
   return new Promise((resolve) => {
-    let currentStep = 0;
-    const totalDuration = ANALYSIS_STEPS.reduce((sum, step) => sum + step.duration, 0);
-    let elapsedTime = 0;
-
-    const runStep = () => {
-      if (currentStep >= ANALYSIS_STEPS.length) {
-        onComplete?.();
-        resolve();
-        return;
-      }
-
-      const step = ANALYSIS_STEPS[currentStep];
-      const percentage = Math.round((elapsedTime / totalDuration) * 100);
+    const startTime = Date.now();
+    const interval = 50; // Update every 50ms for smooth animation
+    
+    const updateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(Math.round((elapsed / TOTAL_DURATION) * 100), 100);
       
-      onProgress?.(step, percentage);
-
-      setTimeout(() => {
-        elapsedTime += step.duration;
-        currentStep++;
-        runStep();
-      }, step.duration);
+      onProgress({
+        progress,
+        message: progress < 100 ? 'Analyzing repositories...' : 'Analysis complete!'
+      });
+      
+      if (progress < 100) {
+        setTimeout(updateProgress, interval);
+      } else {
+        resolve();
+      }
     };
-
-    runStep();
+    
+    updateProgress();
   });
 }
 

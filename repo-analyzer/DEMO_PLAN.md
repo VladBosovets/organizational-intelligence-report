@@ -48,6 +48,7 @@
 
 ### 3. Analysis Progress Page (NEW)
 **Route**: `/analyze/progress`
+**Duration**: 5 seconds (fast and engaging)
 **Purpose**: Show animated "analysis" in progress
 
 **Animation Sequence** (30 seconds total):

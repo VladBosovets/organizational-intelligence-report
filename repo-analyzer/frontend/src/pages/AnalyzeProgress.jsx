@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, Loader } from 'lucide-react';
-import { simulateAnalysis, ANALYSIS_STEPS, extractRepoName } from '../utils/simulateAnalysis';
+import { CheckCircle } from 'lucide-react';
+import { simulateAnalysis, extractRepoName } from '../utils/simulateAnalysis';
 
 const AnalyzeProgress = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(null);
-  const [completedSteps, setCompletedSteps] = useState([]);
   const [progress, setProgress] = useState(0);
+  const [message, setMessage] = useState('');
   const [repos, setRepos] = useState([]);
 
   useEffect(() => {
@@ -22,44 +21,23 @@ const AnalyzeProgress = () => {
     }
 
     // Start the simulated analysis
-    simulateAnalysis(
-      (step, percentage) => {
-        setCurrentStep(step);
-        setProgress(percentage);
-        setCompletedSteps(prev => {
-          if (!prev.find(s => s.id === step.id)) {
-            return [...prev, step];
-          }
-          return prev;
-        });
-      },
-      () => {
-        // Analysis complete - navigate to dashboard
+    simulateAnalysis(({ progress, message }) => {
+      setProgress(progress);
+      setMessage(message);
+      
+      // Navigate to dashboard when complete
+      if (progress === 100) {
         setTimeout(() => {
           navigate('/dashboard');
-        }, 1000);
+        }, 500);
       }
-    );
+    });
   }, [navigate]);
 
-  const getStepStatus = (step) => {
-    if (completedSteps.find(s => s.id === step.id && s.id !== currentStep?.id)) {
-      return 'completed';
-    }
-    if (currentStep?.id === step.id) {
-      return 'active';
-    }
-    return 'pending';
-  };
-
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-3xl mx-auto space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <div className="inline-flex items-center justify-center w-24 h-24 bg-primary-500 rounded-full mb-4 relative">
-          <div className="absolute inset-0 bg-primary-400 rounded-full animate-ping opacity-75"></div>
-          <Loader className="w-12 h-12 text-white animate-spin relative z-10" />
-        </div>
         <h1 className="text-4xl font-bold text-secondary-900">
           Analyzing Repositories
         </h1>
@@ -81,74 +59,43 @@ const AnalyzeProgress = () => {
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="card space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-secondary-700">Overall Progress</span>
-          <span className="text-2xl font-bold text-primary-600">{progress}%</span>
-        </div>
-        <div className="w-full bg-secondary-200 rounded-full h-4 overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-500 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
+      {/* Bob Animation with Progress */}
+      <div className="card">
+        <div className="flex flex-col items-center justify-center py-12 space-y-8">
+          {/* Bob's Head - Bouncing Animation */}
+          <div className="relative">
+            <div className="animate-bounce">
+              <img 
+                src="/bob.svg" 
+                alt="Bob analyzing" 
+                className="w-32 h-32"
+              />
+            </div>
+          </div>
 
-      {/* Analysis Steps */}
-      <div className="card space-y-4">
-        <h3 className="font-semibold text-lg mb-4">Analysis Steps</h3>
-        <div className="space-y-3">
-          {ANALYSIS_STEPS.map((step) => {
-            const status = getStepStatus(step);
-            return (
+          {/* Progress Percentage */}
+          <div className="text-center space-y-2">
+            <div className="text-6xl font-bold text-primary-600">
+              {progress}%
+            </div>
+            <p className="text-lg text-secondary-600">{message}</p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full max-w-md">
+            <div className="w-full bg-secondary-200 rounded-full h-3 overflow-hidden">
               <div
-                key={step.id}
-                className={`flex items-start space-x-4 p-4 rounded-lg transition-all duration-300 ${
-                  status === 'active'
-                    ? 'bg-primary-50 border-2 border-primary-500'
-                    : status === 'completed'
-                    ? 'bg-success-50 border border-success-200'
-                    : 'bg-secondary-50 border border-secondary-200'
-                }`}
-              >
-                <div className="flex-shrink-0 mt-1">
-                  {status === 'completed' ? (
-                    <CheckCircle className="w-6 h-6 text-success-600" />
-                  ) : status === 'active' ? (
-                    <Loader className="w-6 h-6 text-primary-600 animate-spin" />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full border-2 border-secondary-300" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <span className="text-2xl">{step.icon}</span>
-                    <h4
-                      className={`font-semibold ${
-                        status === 'active'
-                          ? 'text-primary-700'
-                          : status === 'completed'
-                          ? 'text-success-700'
-                          : 'text-secondary-600'
-                      }`}
-                    >
-                      {step.label}
-                    </h4>
-                  </div>
-                  {status === 'active' && (
-                    <p className="text-sm text-secondary-600">{step.description}</p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                className="h-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-100 ease-linear"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Footer Message */}
       <div className="text-center text-sm text-secondary-600">
-        <p>This usually takes 20-30 seconds. Please don't close this window.</p>
+        <p>This takes about 5 seconds. Please don't close this window.</p>
       </div>
     </div>
   );
