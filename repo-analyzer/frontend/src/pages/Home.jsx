@@ -37,13 +37,21 @@ const Home = () => {
           AI-powered analysis of your codebase to identify risks, inefficiencies, 
           and opportunities for improvement across multiple repositories
         </p>
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="btn-primary text-lg px-8 py-4 inline-flex items-center space-x-2"
-        >
-          <span>View Analysis</span>
-          <TrendingUp className="w-5 h-5" />
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onClick={() => navigate('/analyze')}
+            className="btn-primary text-lg px-8 py-4 inline-flex items-center space-x-2"
+          >
+            <span>Analyze New Repos</span>
+            <TrendingUp className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="bg-white border-2 border-primary-500 text-primary-600 hover:bg-primary-50 text-lg px-8 py-4 rounded-lg font-medium inline-flex items-center space-x-2 transition-colors"
+          >
+            <span>View Sample Analysis</span>
+          </button>
+        </div>
       </div>
 
       {/* Features Grid */}

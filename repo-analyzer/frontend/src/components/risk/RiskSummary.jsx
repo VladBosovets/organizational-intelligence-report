@@ -7,28 +7,28 @@ const RiskSummary = ({ data }) => {
     {
       icon: AlertTriangle,
       label: 'Critical Developers',
-      value: data.cross_repo_critical_developers?.filter(d => d.risk_score >= 80).length || 0,
+      value: data.summary?.critical_developers || data.cross_repo_critical_developers?.filter(d => d.risk_score >= 80).length || 0,
       subtext: 'High bus factor risk',
       color: 'danger'
     },
     {
       icon: FileCode,
       label: 'Single-Owner Modules',
-      value: data.single_owner_modules?.length || 0,
+      value: data.summary?.single_owner_modules || data.single_owner_modules?.length || 0,
       subtext: 'Need backup maintainers',
       color: 'warning'
     },
     {
       icon: Users,
       label: 'Total Risk Exposure',
-      value: formatCurrency(data.total_bus_factor_risk || 0),
+      value: formatCurrency(data.summary?.total_risk_exposure || data.total_bus_factor_risk || 0),
       subtext: 'Potential impact',
       color: 'danger'
     },
     {
       icon: TrendingUp,
       label: 'Recommendations',
-      value: data.recommendations?.length || 0,
+      value: data.summary?.recommendations || data.cross_repo_critical_developers?.length || 0,
       subtext: 'Risk mitigation actions',
       color: 'primary'
     }

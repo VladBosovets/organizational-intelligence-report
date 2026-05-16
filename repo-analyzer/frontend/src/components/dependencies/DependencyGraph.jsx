@@ -8,15 +8,21 @@ const DependencyGraph = ({ data }) => {
   const graphData = {
     nodes: data.nodes.map(node => ({
       id: node.id,
-      name: node.id,
+      name: node.label || node.id,
       type: node.type,
+      criticality: node.criticality,
       size: node.size || 8,
-      color: GRAPH_CONFIG.nodeColors[node.type] || GRAPH_CONFIG.nodeColors.internal
+      color: node.criticality === 'critical'
+        ? GRAPH_CONFIG.nodeColors.critical
+        : node.type === 'repository'
+        ? GRAPH_CONFIG.nodeColors.repository
+        : GRAPH_CONFIG.nodeColors[node.type] || GRAPH_CONFIG.nodeColors.internal
     })),
     links: data.edges.map(edge => ({
       source: edge.source,
       target: edge.target,
-      type: edge.type
+      type: edge.type,
+      color: edge.type === 'cross_repo' ? '#8a3ffc' : GRAPH_CONFIG.linkColor
     }))
   };
 
@@ -28,6 +34,31 @@ const DependencyGraph = ({ data }) => {
     graphRef.current.zoom(distRatio, 1000);
   }, []);
 
+  const drawNode = useCallback((node, ctx, globalScale) => {
+    const label = node.name;
+    const fontSize = 12/globalScale;
+    ctx.font = `${fontSize}px IBM Plex Sans, sans-serif`;
+    
+    // Draw node circle
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node.size, 0, 2 * Math.PI, false);
+    ctx.fillStyle = node.color;
+    ctx.fill();
+    
+    // Add border for critical nodes
+    if (node.criticality === 'critical') {
+      ctx.strokeStyle = '#da1e28';
+      ctx.lineWidth = 2/globalScale;
+      ctx.stroke();
+    }
+    
+    // Draw label
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#161616';
+    ctx.fillText(label, node.x, node.y + node.size + fontSize + 2);
+  }, []);
+
   return (
     <div className="card">
       <div className="mb-4">
@@ -37,19 +68,28 @@ const DependencyGraph = ({ data }) => {
         </p>
       </div>
       
-      <div className="border border-secondary-200 rounded-lg overflow-hidden bg-secondary-50">
+      <div className="border border-secondary-200 rounded-lg overflow-hidden bg-white">
         <ForceGraph2D
           ref={graphRef}
           graphData={graphData}
-          nodeLabel="name"
-          nodeColor="color"
-          nodeRelSize={GRAPH_CONFIG.nodeSize}
-          linkColor={() => GRAPH_CONFIG.linkColor}
+          nodeLabel={node => `${node.name}${node.criticality ? ` (${node.criticality})` : ''}`}
+          nodeCanvasObject={drawNode}
+          nodePointerAreaPaint={(node, color, ctx) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.size * 1.5, 0, 2 * Math.PI, false);
+            ctx.fill();
+          }}
+          linkColor={link => link.color}
           linkWidth={GRAPH_CONFIG.linkWidth}
+          linkDirectionalParticles={2}
+          linkDirectionalParticleWidth={2}
           onNodeClick={handleNodeClick}
           width={1000}
           height={600}
-          backgroundColor="#f4f4f4"
+          backgroundColor="#ffffff"
+          cooldownTicks={100}
+          d3VelocityDecay={0.3}
         />
       </div>
     </div>

@@ -22,11 +22,16 @@ const BlindspotList = ({ blindspots }) => {
     );
   }
 
-  const totalImpact = blindspots.reduce((sum, b) => 
-    sum + (b.impact_analysis?.total_cost_annual || 0), 0
-  );
+  const totalImpact = blindspots.reduce((sum, b) => {
+    // Try multiple possible field names for annual impact
+    const annualCost = b.recommendation?.savings_annual ||
+                       b.impact_analysis?.total_cost_annual ||
+                       b.impact_analysis?.rework_cost ||
+                       0;
+    return sum + annualCost;
+  }, 0);
 
-  const criticalCount = blindspots.filter(b => 
+  const criticalCount = blindspots.filter(b =>
     b.severity === 'critical' || b.severity === 'high'
   ).length;
 
@@ -41,7 +46,7 @@ const BlindspotList = ({ blindspots }) => {
                 Coordination Blindspots Detected
               </h3>
               <p className="text-warning-600 mt-1">
-                Found {blindspots.length} coordination issue{blindspots.length !== 1 ? 's' : ''} 
+                Found {blindspots.length} coordination issue{blindspots.length !== 1 ? 's' : ''}
                 {criticalCount > 0 && ` (${criticalCount} critical)`}
               </p>
             </div>

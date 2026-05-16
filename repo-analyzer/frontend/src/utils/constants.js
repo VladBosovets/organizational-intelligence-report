@@ -23,6 +23,8 @@ export const GRAPH_CONFIG = {
   linkWidth: 2,
   linkColor: '#c6c6c6',
   nodeColors: {
+    repository: '#24a148',
+    module: '#0f62fe',
     internal: '#0f62fe',
     external: '#8a3ffc',
     critical: '#da1e28'
