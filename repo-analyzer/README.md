@@ -1,8 +1,12 @@
 # Organizational Intelligence Report Tool
 
-> AI-powered repository analysis tool that identifies code inefficiencies, developer risks, and cost-saving opportunities across your organization's codebases.
+[![Built with IBM Bob](https://img.shields.io/badge/Built%20with-IBM%20Bob-0f62fe?style=for-the-badge&logo=ibm)](https://bob.ibm.com)
+[![React](https://img.shields.io/badge/React-18.2-61dafb?style=for-the-badge&logo=react)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-5.0-646cff?style=for-the-badge&logo=vite)](https://vitejs.dev)
 
-Built with IBM Bob AI | React + Vite | Zero Backend Required
+> 🤖 **100% Built with IBM Bob AI** - AI-powered repository analysis tool that identifies code inefficiencies, developer risks, and cost-saving opportunities across your organization's codebases.
+
+**37.17 bobcoins used** | React + Vite | Zero Backend Required
 
 ---
 
