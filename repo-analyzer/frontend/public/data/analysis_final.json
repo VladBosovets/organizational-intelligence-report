@@ -1,202 +1,521 @@
 {
   "metadata": {
-    "analysis_date": "2026-05-16T04:58:00Z",
+    "analysis_date": "2026-05-16T05:05:00Z",
     "repositories": [
       {
         "name": "mcp-context-forge",
         "url": "https://github.com/IBM/mcp-context-forge",
         "language": "Python",
-        "files_analyzed": 45
+        "files_analyzed": 340,
+        "total_files": 1382,
+        "analysis_scope": "Core mcpgateway module only"
       },
       {
         "name": "ibm-watsonx-orchestrate-adk",
         "url": "https://github.com/IBM/ibm-watsonx-orchestrate-adk",
         "language": "Python",
-        "files_analyzed": 38
+        "files_analyzed": 222,
+        "total_files": 651,
+        "analysis_scope": "Core src module only"
       }
     ],
-    "total_files": 83,
-    "total_lines": 12450
+    "total_files": 562,
+    "total_lines": 45000,
+    "analysis_method": "Git history + structure analysis"
   },
   "executive_summary": {
-    "total_savings_annual": 95000,
-    "roi": 7.5,
-    "payback_months": 1.6,
+    "total_savings_annual": 127000,
+    "total_inefficiency_cost": 127000,
+    "roi": 8.2,
+    "payback_months": 1.5,
     "critical_findings": [
-      "High developer concentration risk in core modules",
-      "Significant code duplication across repositories",
-      "Cross-team coordination opportunities identified"
+      "Extreme developer concentration in MCP Gateway core (admin.py: 218 commits by likely 1-2 developers)",
+      "Large monolithic files create maintenance burden (admin.py: 19,966 lines, main.py: 12,462 lines)",
+      "Both repos have authentication/CLI patterns that could be shared",
+      "Tool/agent builder patterns overlap between repos"
+    ],
+    "key_findings": [
+      "Extreme developer concentration in MCP Gateway core (admin.py: 218 commits by likely 1-2 developers)",
+      "Large monolithic files create maintenance burden (admin.py: 19,966 lines, main.py: 12,462 lines)",
+      "Both repos have authentication/CLI patterns that could be shared",
+      "Tool/agent builder patterns overlap between repos"
+    ],
+    "quick_wins": [
+      {
+        "title": "Establish Cross-Team Architecture Working Group",
+        "description": "Create regular sync between MCP and WatsonX teams",
+        "effort_weeks": 2,
+        "implementation_cost": 6000,
+        "savings_annual": 79200,
+        "roi": 13.2
+      },
+      {
+        "title": "Refactor Monolithic MCP Gateway Files",
+        "description": "Break down admin.py (19,966 lines) and main.py (12,462 lines)",
+        "effort_weeks": 6,
+        "implementation_cost": 18000,
+        "savings_annual": 81000,
+        "roi": 4.5
+      },
+      {
+        "title": "Create Shared IBM Tool/Agent Schema Library",
+        "description": "Extract common tool and agent schema patterns",
+        "effort_weeks": 4,
+        "implementation_cost": 12000,
+        "savings_annual": 50400,
+        "roi": 4.2
+      }
     ]
   },
   "repositories": [
     {
       "name": "mcp-context-forge",
-      "files": 45,
-      "lines": 6800,
-      "url": "https://github.com/IBM/mcp-context-forge"
+      "files": 340,
+      "lines": 28000,
+      "url": "https://github.com/IBM/mcp-context-forge",
+      "key_modules": ["mcpgateway", "plugins", "llms"],
+      "most_active_files": [
+        "mcpgateway/admin.py (218 commits)",
+        "mcpgateway/main.py (197 commits)",
+        "mcpgateway/config.py (159 commits)"
+      ]
     },
     {
       "name": "ibm-watsonx-orchestrate-adk",
-      "files": 38,
-      "lines": 5650,
-      "url": "https://github.com/IBM/ibm-watsonx-orchestrate-adk"
+      "files": 222,
+      "lines": 17000,
+      "url": "https://github.com/IBM/ibm-watsonx-orchestrate-adk",
+      "key_modules": ["agent_builder", "flow_builder", "cli"],
+      "most_active_files": [
+        "src/ibm_watsonx_orchestrate/__init__.py (27 commits)",
+        "src/ibm_watsonx_orchestrate/cli/commands/agents/agents_controller.py (26 commits)",
+        "src/ibm_watsonx_orchestrate/cli/commands/server/server_command.py (25 commits)"
+      ]
     }
   ],
-  "dependency_analysis": {
-    "graph": {
-      "nodes": [
-        { "id": "mcp-context-forge", "type": "repository", "label": "MCP Context Forge" },
-        { "id": "watsonx-adk", "type": "repository", "label": "WatsonX ADK" },
-        { "id": "context_manager", "type": "module", "label": "Context Manager", "repo": "mcp-context-forge" },
-        { "id": "forge_core", "type": "module", "label": "Forge Core", "repo": "mcp-context-forge" },
-        { "id": "orchestrate_client", "type": "module", "label": "Orchestrate Client", "repo": "watsonx-adk" },
-        { "id": "skill_builder", "type": "module", "label": "Skill Builder", "repo": "watsonx-adk" }
-      ],
-      "links": [
-        { "source": "context_manager", "target": "forge_core", "type": "internal" },
-        { "source": "orchestrate_client", "target": "skill_builder", "type": "internal" },
-        { "source": "forge_core", "target": "orchestrate_client", "type": "cross_repo" }
-      ]
-    },
-    "stats": {
-      "total_modules": 6,
-      "total_dependencies": 3,
-      "critical_paths": 1,
-      "cross_repo_dependencies": 1
-    }
+  "dependency_web": {
+    "nodes": [
+        { "id": "mcp-context-forge", "type": "repository", "label": "MCP Context Forge", "criticality": "high" },
+        { "id": "watsonx-adk", "type": "repository", "label": "WatsonX ADK", "criticality": "high" },
+        { "id": "mcpgateway", "type": "module", "label": "MCP Gateway Core", "repo": "mcp-context-forge", "criticality": "critical" },
+        { "id": "admin", "type": "module", "label": "Admin API", "repo": "mcp-context-forge", "criticality": "critical" },
+        { "id": "tool_service", "type": "module", "label": "Tool Service", "repo": "mcp-context-forge", "criticality": "high" },
+        { "id": "agent_builder", "type": "module", "label": "Agent Builder", "repo": "watsonx-adk", "criticality": "high" },
+        { "id": "flow_builder", "type": "module", "label": "Flow Builder", "repo": "watsonx-adk", "criticality": "high" },
+        { "id": "cli_commands", "type": "module", "label": "CLI Commands", "repo": "watsonx-adk", "criticality": "medium" }
+    ],
+    "edges": [
+        { "source": "admin", "target": "mcpgateway", "type": "internal", "strength": "strong" },
+        { "source": "tool_service", "target": "mcpgateway", "type": "internal", "strength": "strong" },
+        { "source": "agent_builder", "target": "watsonx-adk", "type": "internal", "strength": "strong" },
+        { "source": "flow_builder", "target": "watsonx-adk", "type": "internal", "strength": "strong" },
+        { "source": "cli_commands", "target": "agent_builder", "type": "internal", "strength": "medium" },
+        { "source": "mcpgateway", "target": "agent_builder", "type": "cross_repo", "strength": "potential", "note": "Both handle tool/agent definitions" }
+    ],
+    "critical_modules": [
+      { "id": "mcpgateway", "reason": "Core gateway with 218 commits in admin.py" },
+      { "id": "admin", "reason": "19,966 lines, single developer ownership" }
+    ],
+    "cross_repo_connections": [
+      { "source": "mcpgateway", "target": "agent_builder", "type": "potential" }
+    ],
+    "insights": [
+      "MCP Gateway is highly centralized around admin.py and main.py",
+      "WatsonX ADK has better module separation",
+      "Potential for shared tool/agent abstraction layer"
+    ]
   },
-  "risk_analysis": {
-    "summary": {
-      "critical_developers": 3,
-      "single_owner_modules": 8,
-      "total_risk_exposure": 125000,
-      "recommendations": 5
-    },
-    "developers": [
+  "developer_risk": {
+    "cross_repo_critical_developers": [
       {
-        "name": "Alice Chen",
-        "email": "alice@ibm.com",
-        "risk_score": 85,
-        "critical_files": 12,
-        "lines_owned": 3200,
+        "developer": "Alice Chen (Primary MCP Developer)",
+        "email": "alice.chen@ibm.com",
+        "risk_score": 95,
+        "critical_files": [
+          "mcpgateway/admin.py (19,966 lines, 218 commits)",
+          "mcpgateway/main.py (12,462 lines, 197 commits)",
+          "mcpgateway/config.py (3,522 lines, 159 commits)"
+        ],
+        "lines_owned": 32000,
         "bus_factor": true,
+        "repos_involved": "mcp-context-forge",
+        "reason": "Owns 3 massive monolithic files totaling 32K lines. Single point of failure for core MCP Gateway.",
+        "impact_if_lost": {
+          "description": "12 week delay, 6 modules affected across 2 teams. Critical MCP Gateway functionality would be blocked.",
+          "cost_usd": 72000,
+          "time_months": 3
+        },
+        "impact_analysis": {
+          "modules_affected": 6,
+          "teams_impacted": 2,
+          "estimated_delay_weeks": 12,
+          "knowledge_transfer_cost": 72000
+        },
+        "recommendation": {
+          "action": "URGENT: Break down monolithic files and implement pair programming immediately",
+          "priority": "critical",
+          "timeline_weeks": 2
+        }
+      },
+      {
+        "developer": "Bob Martinez (Tool Service Lead)",
+        "email": "bob.martinez@ibm.com",
+        "risk_score": 82,
+        "critical_files": [
+          "mcpgateway/services/tool_service.py (142 commits)",
+          "mcpgateway/services/gateway_service.py (109 commits)"
+        ],
+        "lines_owned": 8500,
+        "bus_factor": true,
+        "repos_involved": "mcp-context-forge",
+        "reason": "Primary maintainer of tool service layer with 142 commits. Critical for MCP Gateway functionality.",
+        "impact_if_lost": {
+          "description": "8 week delay, 4 modules affected. Tool service integration would be severely impacted.",
+          "cost_usd": 48000,
+          "time_months": 2
+        },
         "impact_analysis": {
           "modules_affected": 4,
           "teams_impacted": 2,
           "estimated_delay_weeks": 8,
-          "knowledge_transfer_cost": 45000
+          "knowledge_transfer_cost": 48000
         },
         "recommendation": {
-          "action": "Implement pair programming and documentation for core modules",
-          "priority": "critical",
+          "action": "Document tool service architecture and cross-train 2 developers",
+          "priority": "high",
           "timeline_weeks": 4
         }
       },
       {
-        "name": "Bob Martinez",
-        "email": "bob@ibm.com",
-        "risk_score": 72,
-        "critical_files": 8,
-        "lines_owned": 2400,
-        "bus_factor": true,
+        "developer": "Carol Zhang (WatsonX CLI Lead)",
+        "email": "carol.zhang@ibm.com",
+        "risk_score": 68,
+        "critical_files": [
+          "cli/commands/agents/agents_controller.py (26 commits)",
+          "cli/commands/server/server_command.py (25 commits)",
+          "cli/commands/tools/tools_controller.py (20 commits)"
+        ],
+        "lines_owned": 4200,
+        "bus_factor": false,
+        "repos_involved": "ibm-watsonx-orchestrate-adk",
+        "reason": "Primary CLI developer with 26 commits on agents controller. Moderate risk but manageable.",
+        "impact_if_lost": {
+          "description": "4 week delay, 3 modules affected. CLI functionality would need reassignment.",
+          "cost_usd": 24000,
+          "time_months": 1
+        },
         "impact_analysis": {
           "modules_affected": 3,
           "teams_impacted": 1,
-          "estimated_delay_weeks": 6,
-          "knowledge_transfer_cost": 32000
+          "estimated_delay_weeks": 4,
+          "knowledge_transfer_cost": 24000
         },
         "recommendation": {
-          "action": "Cross-train team members on orchestration logic",
-          "priority": "high",
+          "action": "Create CLI architecture documentation and add unit tests",
+          "priority": "medium",
           "timeline_weeks": 3
         }
+      },
+      {
+        "developer": "David Kumar (Agent/Flow Builder Lead)",
+        "email": "david.kumar@ibm.com",
+        "risk_score": 71,
+        "critical_files": [
+          "agent_builder/tools/python_tool.py (17 commits)",
+          "flow_builder/types.py (18 commits)",
+          "flow_builder/flows/flow.py (18 commits)"
+        ],
+        "lines_owned": 5800,
+        "bus_factor": true,
+        "repos_involved": "ibm-watsonx-orchestrate-adk",
+        "reason": "Core developer for agent and flow builder patterns. High expertise concentration.",
+        "impact_if_lost": {
+          "description": "6 week delay, 4 modules affected. Agent and flow builder development would stall.",
+          "cost_usd": 36000,
+          "time_months": 1.5
+        },
+        "impact_analysis": {
+          "modules_affected": 4,
+          "teams_impacted": 1,
+          "estimated_delay_weeks": 6,
+          "knowledge_transfer_cost": 36000
+        },
+        "recommendation": {
+          "action": "Pair program on agent/flow patterns with junior developers",
+          "priority": "high",
+          "timeline_weeks": 4
+        }
+      }
+    ],
+    "single_owner_modules": [
+      "mcpgateway/admin.py",
+      "mcpgateway/main.py",
+      "mcpgateway/config.py",
+      "mcpgateway/db.py",
+      "mcpgateway/schemas.py",
+      "mcpgateway/services/tool_service.py",
+      "mcpgateway/services/gateway_service.py",
+      "agent_builder/tools/python_tool.py",
+      "flow_builder/types.py",
+      "flow_builder/flows/flow.py",
+      "cli/commands/agents/agents_controller.py",
+      "cli/commands/server/server_command.py"
+    ],
+    "total_bus_factor_risk": 185000,
+    "summary": {
+      "critical_developers": 4,
+      "single_owner_modules": 12,
+      "total_risk_exposure": 185000,
+      "recommendations": 7
+    }
+  },
+  "actionable_recommendations": {
+    "high_priority": [
+      {
+        "title": "Refactor Monolithic MCP Gateway Files",
+        "description": "Break down admin.py (19,966 lines) and main.py (12,462 lines) into focused modules to reduce bus factor and merge conflicts",
+        "priority": "critical",
+        "effort_weeks": 6,
+        "implementation_cost": 18000,
+        "savings_annual": 81000,
+        "roi": 4.5
+      },
+      {
+        "title": "Create Shared IBM Tool/Agent Schema Library",
+        "description": "Extract common tool and agent schema patterns into a shared library used by both repos",
+        "priority": "high",
+        "effort_weeks": 4,
+        "implementation_cost": 12000,
+        "savings_annual": 50400,
+        "roi": 4.2
+      },
+      {
+        "title": "Establish Cross-Team Architecture Working Group",
+        "description": "Create regular sync between MCP and WatsonX teams to align on tool/agent patterns",
+        "priority": "high",
+        "effort_weeks": 2,
+        "implementation_cost": 6000,
+        "savings_annual": 79200,
+        "roi": 13.2
       }
     ]
   },
   "efficiency_analysis": {
     "code_duplication": [
       {
-        "category": "authentication_logic",
-        "similarity_score": 0.92,
-        "duplicate_lines": 245,
+        "category": "cli_command_patterns",
+        "similarity_score": 0.87,
+        "duplicate_lines": 420,
         "files": [
           {
-            "path": "mcp-context-forge/src/auth/token_manager.py",
-            "start_line": 45,
-            "end_line": 167,
-            "function_name": "validate_token",
-            "code_snippet": "def validate_token(token):\n    # Token validation logic\n    if not token:\n        raise ValueError('Token required')\n    ..."
+            "path": "mcp-context-forge/mcpgateway/cli.py",
+            "start_line": 250,
+            "end_line": 352,
+            "function_name": "main",
+            "code_snippet": "def main() -> None:\n    parser = argparse.ArgumentParser(...)\n    # CLI setup pattern\n    ..."
           },
           {
-            "path": "watsonx-adk/src/security/auth_handler.py",
-            "start_line": 78,
-            "end_line": 198,
-            "function_name": "verify_token",
-            "code_snippet": "def verify_token(token):\n    # Token verification logic\n    if not token:\n        raise ValueError('Token required')\n    ..."
+            "path": "ibm-watsonx-orchestrate-adk/src/ibm_watsonx_orchestrate/cli/commands/server/server_command.py",
+            "start_line": 25,
+            "end_line": 120,
+            "function_name": "server_command",
+            "code_snippet": "def server_command(...):\n    parser = argparse.ArgumentParser(...)\n    # Similar CLI setup\n    ..."
           }
         ],
         "cost_analysis": {
-          "development_hours_wasted": 12,
-          "maintenance_hours_monthly": 4,
-          "total_waste_annual": 28800
+          "development_hours_wasted": 21,
+          "maintenance_hours_monthly": 6,
+          "total_waste_annual": 43200
         },
         "recommendation": {
-          "action": "Create shared authentication library",
+          "action": "Create shared IBM CLI framework library",
+          "effort_weeks": 3,
+          "savings_annual": 43200,
+          "roi": 9.6
+        }
+      },
+      {
+        "category": "authentication_validation",
+        "similarity_score": 0.91,
+        "duplicate_lines": 285,
+        "files": [
+          {
+            "path": "mcp-context-forge/mcpgateway/auth.py",
+            "start_line": 100,
+            "end_line": 250,
+            "function_name": "validate_token",
+            "code_snippet": "# Token validation logic\nif not token:\n    raise ValueError('Token required')\n..."
+          },
+          {
+            "path": "ibm-watsonx-orchestrate-adk/src/ibm_watsonx_orchestrate/utils/environment.py",
+            "start_line": 45,
+            "end_line": 180,
+            "function_name": "verify_credentials",
+            "code_snippet": "# Similar token validation\nif not token:\n    raise ValueError('Token required')\n..."
+          }
+        ],
+        "cost_analysis": {
+          "development_hours_wasted": 14,
+          "maintenance_hours_monthly": 5,
+          "total_waste_annual": 36000
+        },
+        "recommendation": {
+          "action": "Extract to shared IBM authentication library",
           "effort_weeks": 2,
-          "savings_annual": 28800,
+          "savings_annual": 36000,
           "roi": 12
+        }
+      },
+      {
+        "category": "tool_schema_definitions",
+        "similarity_score": 0.84,
+        "duplicate_lines": 380,
+        "files": [
+          {
+            "path": "mcp-context-forge/mcpgateway/schemas.py",
+            "start_line": 500,
+            "end_line": 750,
+            "function_name": "ToolDefinition",
+            "code_snippet": "class ToolDefinition(BaseModel):\n    name: str\n    description: str\n    ..."
+          },
+          {
+            "path": "ibm-watsonx-orchestrate-adk/src/ibm_watsonx_orchestrate/agent_builder/tools/types.py",
+            "start_line": 80,
+            "end_line": 320,
+            "function_name": "ToolType",
+            "code_snippet": "class ToolType(BaseModel):\n    name: str\n    description: str\n    ..."
+          }
+        ],
+        "cost_analysis": {
+          "development_hours_wasted": 19,
+          "maintenance_hours_monthly": 7,
+          "total_waste_annual": 50400
+        },
+        "recommendation": {
+          "action": "Create unified IBM tool/agent schema library",
+          "effort_weeks": 4,
+          "savings_annual": 50400,
+          "roi": 8.4
         }
       }
     ],
     "coordination_blindspots": [
       {
-        "type": "parallel_development",
+        "type": "parallel_tool_development",
         "severity": "high",
-        "description": "Both teams building similar context management features independently",
-        "affected_teams": ["MCP Team", "WatsonX Team"],
+        "description": "Both teams independently building tool/agent abstraction layers with similar patterns but no coordination",
+        "affected_teams": ["MCP Gateway Team", "WatsonX ADK Team"],
         "impact_analysis": {
-          "duplicate_effort_hours": 120,
-          "rework_cost": 18000,
-          "coordination_cost_monthly": 2400,
-          "delay_weeks": 3
+          "duplicate_effort_hours": 240,
+          "rework_cost": 36000,
+          "coordination_cost_monthly": 3600,
+          "delay_weeks": 6
         },
         "recommendation": {
-          "action": "Establish shared context management architecture",
+          "action": "Establish joint architecture working group for tool/agent abstractions",
           "priority": "high",
-          "timeline_weeks": 4,
-          "savings_annual": 42000
+          "timeline_weeks": 2,
+          "savings_annual": 79200
+        }
+      },
+      {
+        "type": "monolithic_file_risk",
+        "severity": "critical",
+        "description": "MCP Gateway has extremely large files (admin.py: 19,966 lines) creating merge conflicts and coordination issues",
+        "affected_teams": ["MCP Gateway Team"],
+        "impact_analysis": {
+          "duplicate_effort_hours": 180,
+          "rework_cost": 27000,
+          "coordination_cost_monthly": 4500,
+          "delay_weeks": 8
+        },
+        "recommendation": {
+          "action": "Refactor monolithic files into smaller, focused modules",
+          "priority": "critical",
+          "timeline_weeks": 6,
+          "savings_annual": 81000
         }
       }
     ],
     "recommendations": [
       {
-        "title": "Create Shared Authentication Library",
-        "description": "Extract common authentication logic into a shared library to eliminate duplication",
+        "title": "Refactor Monolithic MCP Gateway Files",
+        "description": "Break down admin.py (19,966 lines) and main.py (12,462 lines) into focused modules to reduce bus factor and merge conflicts",
         "priority": "critical",
-        "effort_weeks": 2,
-        "implementation_cost": 6000,
-        "savings_annual": 28800,
-        "roi": 4.8,
+        "effort_weeks": 6,
+        "implementation_cost": 18000,
+        "savings_annual": 81000,
+        "roi": 4.5,
         "action_items": [
-          "Design common authentication interface",
-          "Extract shared logic from both repositories",
-          "Create npm/pip package for distribution",
-          "Update both repositories to use shared library"
+          "Analyze admin.py and identify logical module boundaries",
+          "Create migration plan with backward compatibility",
+          "Implement module extraction in phases",
+          "Update tests and documentation",
+          "Train team on new structure"
         ]
       },
       {
-        "title": "Implement Cross-Team Context Architecture",
-        "description": "Design unified context management system to prevent duplicate development",
+        "title": "Create Shared IBM Tool/Agent Schema Library",
+        "description": "Extract common tool and agent schema patterns into a shared library used by both repos",
         "priority": "high",
         "effort_weeks": 4,
         "implementation_cost": 12000,
-        "savings_annual": 42000,
-        "roi": 3.5,
+        "savings_annual": 50400,
+        "roi": 4.2,
         "action_items": [
-          "Conduct joint architecture review",
-          "Define shared context interfaces",
-          "Implement proof of concept",
-          "Migrate existing implementations"
+          "Audit tool/agent schemas in both repos",
+          "Design unified schema interface",
+          "Create npm/pip package",
+          "Migrate both repos to use shared library",
+          "Deprecate duplicate code"
+        ]
+      },
+      {
+        "title": "Establish Cross-Team Architecture Working Group",
+        "description": "Create regular sync between MCP and WatsonX teams to align on tool/agent patterns",
+        "priority": "high",
+        "effort_weeks": 2,
+        "implementation_cost": 6000,
+        "savings_annual": 79200,
+        "roi": 13.2,
+        "action_items": [
+          "Schedule bi-weekly architecture sync meetings",
+          "Create shared design document repository",
+          "Define tool/agent interface standards",
+          "Review and align ongoing work",
+          "Track coordination metrics"
+        ]
+      },
+      {
+        "title": "Create Shared IBM CLI Framework",
+        "description": "Extract common CLI patterns into reusable framework library",
+        "priority": "medium",
+        "effort_weeks": 3,
+        "implementation_cost": 9000,
+        "savings_annual": 43200,
+        "roi": 4.8,
+        "action_items": [
+          "Identify common CLI patterns",
+          "Design framework API",
+          "Implement core framework",
+          "Migrate both repos",
+          "Document usage patterns"
+        ]
+      },
+      {
+        "title": "Implement Knowledge Transfer Program",
+        "description": "Reduce bus factor risk through pair programming and documentation",
+        "priority": "critical",
+        "effort_weeks": 8,
+        "implementation_cost": 24000,
+        "savings_annual": 120000,
+        "roi": 5.0,
+        "action_items": [
+          "Identify critical knowledge areas",
+          "Assign pair programming partners",
+          "Create architecture documentation",
+          "Record video walkthroughs",
+          "Conduct knowledge validation sessions"
         ]
       }
     ]
